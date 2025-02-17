@@ -19,7 +19,7 @@ import (
 
 type repository interface {
 	Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error)
-	UserLogin(buf bytes.Buffer) (*http.Cookie, error)
+	UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error)
 	GetUserFromCookie(cookieValue string) (string, error)
 	GetServerSettings() *config.ServerSettings
 	PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error
@@ -59,15 +59,15 @@ func (s *Service) Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie,
 	return cookie, nil
 }
 
-func (s *Service) UserLogin(buf bytes.Buffer) (*http.Cookie, error) {
+func (s *Service) UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error) {
 	var err error
 	lgnPsw := LgnPsw{}
 	if err = json.Unmarshal(buf.Bytes(), &lgnPsw); err != nil {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	if err = dbstorage.CheckLgnPsw(ctx, s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
 		return nil, err
 	}

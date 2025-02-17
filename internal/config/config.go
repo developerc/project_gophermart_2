@@ -76,7 +76,7 @@ func (s *ServerSettings) Register(ctx context.Context, buf bytes.Buffer) (*http.
 	return nil, nil
 }
 
-func (s *ServerSettings) UserLogin(buf bytes.Buffer) (*http.Cookie, error) {
+func (s *ServerSettings) UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error) {
 	return nil, nil
 }
 

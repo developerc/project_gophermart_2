@@ -39,7 +39,7 @@ func TestApi(t *testing.T) {
 		require.NoError(t, err)
 	})
 	t.Run("#2_LoginTest", func(t *testing.T) {
-		_, err = service.UserLogin(buf)
+		_, err = service.UserLogin(ctx, buf)
 		require.NoError(t, err)
 	})
 	t.Run("#3_PostUserOrdersTest", func(t *testing.T) {

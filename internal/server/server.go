@@ -16,7 +16,7 @@ import (
 
 type svc interface {
 	Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error)
-	UserLogin(buf bytes.Buffer) (*http.Cookie, error)
+	UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error)
 	GetUserFromCookie(cookieValue string) (string, error)
 	PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error
 	GetUserOrders(usr string) ([]byte, error)
@@ -63,7 +63,7 @@ func (s *Server) UserLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	cookie, err := s.service.UserLogin(buf)
+	cookie, err := s.service.UserLogin(r.Context(), buf)
 	if err != nil {
 		if _, ok := err.(*dbstorage.ErrorLgnPsw); ok {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
