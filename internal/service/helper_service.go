@@ -85,7 +85,7 @@ func (s *Service) GetUserOrders(usr string) ([]byte, error) {
 }
 
 func (s Service) GetUserBalance(usr string) ([]byte, error) {
-	userBalance, err := dbstorage.GetUserBalance2(s.repo.GetServerSettings().DB, usr)
+	userBalance, err := dbstorage.GetUserBalance(s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (s *Service) PostBalanceWithdraw(usr string, buf bytes.Buffer) error {
 	if err != nil {
 		return err
 	}
-	err = dbstorage.BalanceWithdraw2(s.repo.GetServerSettings().DB, usr, orderSum.Order, orderSum.Sum)
+	err = dbstorage.BalanceWithdraw(s.repo.GetServerSettings().DB, usr, orderSum.Order, orderSum.Sum)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func checkLuhna(order string) error {
 }
 
 func (s *Service) GetUserWithdrawals(usr string) ([]byte, error) {
-	arrWithdrawOrder, err := dbstorage.GetUserWithdrawals2(s.repo.GetServerSettings().DB, usr)
+	arrWithdrawOrder, err := dbstorage.GetUserWithdrawals(s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
 	}
