@@ -88,11 +88,11 @@ func (s *ServerSettings) PostUserOrders(ctx context.Context, usr string, buf byt
 	return nil
 }
 
-func (s *ServerSettings) GetUserOrders(usr string) ([]byte, error) {
+func (s *ServerSettings) GetUserOrders(ctx context.Context, usr string) ([]byte, error) {
 	return nil, nil
 }
 
-func (s *ServerSettings) GetUserBalance(usr string) ([]byte, error) {
+func (s *ServerSettings) GetUserBalance(ctx context.Context, usr string) ([]byte, error) {
 	return nil, nil
 }
 

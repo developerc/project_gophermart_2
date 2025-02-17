@@ -19,8 +19,8 @@ type svc interface {
 	UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error)
 	GetUserFromCookie(cookieValue string) (string, error)
 	PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error
-	GetUserOrders(usr string) ([]byte, error)
-	GetUserBalance(usr string) ([]byte, error)
+	GetUserOrders(ctx context.Context, usr string) ([]byte, error)
+	GetUserBalance(ctx context.Context, usr string) ([]byte, error)
 	PostBalanceWithdraw(usr string, buf bytes.Buffer) error
 	GetUserWithdrawals(usr string) ([]byte, error)
 }
@@ -141,7 +141,7 @@ func (s *Server) GetUserOrders(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	jsonBytes, err = s.service.GetUserOrders(usr)
+	jsonBytes, err = s.service.GetUserOrders(r.Context(), usr)
 	if err != nil {
 		if _, ok := err.(*general.ErrorNoContent); ok {
 			http.Error(w, err.Error(), http.StatusNoContent)
@@ -177,7 +177,7 @@ func (s *Server) GetUserBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonBytes, err = s.service.GetUserBalance(usr)
+	jsonBytes, err = s.service.GetUserBalance(r.Context(), usr)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

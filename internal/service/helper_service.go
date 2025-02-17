@@ -72,9 +72,9 @@ func (s *Service) PostUserOrders(ctx context.Context, usr string, buf bytes.Buff
 	return nil
 }
 
-func (s *Service) GetUserOrders(usr string) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func (s *Service) GetUserOrders(ctx context.Context, usr string) ([]byte, error) {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	arrUploadedOrder, err := dbstorage.GetUserOrders(ctx, s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
@@ -90,9 +90,9 @@ func (s *Service) GetUserOrders(usr string) ([]byte, error) {
 	return jsonBytes, nil
 }
 
-func (s Service) GetUserBalance(usr string) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func (s Service) GetUserBalance(ctx context.Context, usr string) ([]byte, error) {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	userBalance, err := dbstorage.GetUserBalance(ctx, s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err

@@ -23,8 +23,8 @@ type repository interface {
 	GetUserFromCookie(cookieValue string) (string, error)
 	GetServerSettings() *config.ServerSettings
 	PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error
-	GetUserOrders(usr string) ([]byte, error)
-	GetUserBalance(usr string) ([]byte, error)
+	GetUserOrders(ctx context.Context, usr string) ([]byte, error)
+	GetUserBalance(ctx context.Context, usr string) ([]byte, error)
 	PostBalanceWithdraw(usr string, buf bytes.Buffer) error
 	GetUserWithdrawals(usr string) ([]byte, error)
 }
