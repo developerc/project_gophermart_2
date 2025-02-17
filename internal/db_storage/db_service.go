@@ -100,9 +100,10 @@ func UploadOrder(db *sql.DB, usr, orderNum string) error {
 	if err != nil {
 		return err
 	}
-	rows, err := db.QueryContext(ctx, "SELECT usr FROM orders_table WHERE order_numb = $1 ", orderNum)
+	defer tx.Rollback()
+
+	rows, err := db.QueryContext(ctx, "SELECT usr FROM orders_table WHERE order_numb = $1 FOR UPDATE", orderNum)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 	defer rows.Close()
@@ -113,7 +114,6 @@ func UploadOrder(db *sql.DB, usr, orderNum string) error {
 		cntrRows++
 		err = rows.Scan(&usrInTable)
 		if err != nil {
-			tx.Rollback()
 			return err
 		}
 	}
@@ -123,10 +123,8 @@ func UploadOrder(db *sql.DB, usr, orderNum string) error {
 	}
 	if cntrRows > 0 {
 		if usrInTable == usr {
-			tx.Rollback()
 			return &general.ErrorExistsOrderSame{}
 		} else {
-			tx.Rollback()
 			return &general.ErrorExistsOrderOther{}
 		}
 	}
@@ -233,22 +231,21 @@ func BalanceWithdraw2(db *sql.DB, usr string, order string, sum float64) error {
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
+
 	rows, err := db.QueryContext(ctx, "SELECT COALESCE(SUM(accrual), 0 ), COALESCE(SUM(withdraw), 0 ) from orders_table WHERE usr = $1 ", usr)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		err = rows.Scan(&sumAccrual, &sumWithdraw)
 		if err != nil {
-			tx.Rollback()
 			return err
 		}
 	}
 	err = rows.Err()
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 	diffSum = sumAccrual - sumWithdraw
@@ -258,7 +255,6 @@ func BalanceWithdraw2(db *sql.DB, usr string, order string, sum float64) error {
 
 	_, err = db.ExecContext(ctx, "INSERT INTO orders_table (usr, order_numb, withdraw) values ($1, $2, $3)", usr, order, sum)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
