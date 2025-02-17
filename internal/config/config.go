@@ -72,7 +72,7 @@ func (s *ServerSettings) GetServerSettings() *ServerSettings {
 	return s
 }
 
-func (s *ServerSettings) Register(buf bytes.Buffer) (*http.Cookie, error) {
+func (s *ServerSettings) Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error) {
 	return nil, nil
 }
 

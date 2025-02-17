@@ -35,7 +35,7 @@ func TestApi(t *testing.T) {
 		jsonBytes, err := json.Marshal(lgnPsv)
 		require.NoError(t, err)
 		buf = *bytes.NewBuffer(jsonBytes)
-		_, err = service.Register(buf)
+		_, err = service.Register(ctx, buf)
 		require.NoError(t, err)
 	})
 	t.Run("#2_LoginTest", func(t *testing.T) {

@@ -15,7 +15,7 @@ import (
 )
 
 type svc interface {
-	Register(buf bytes.Buffer) (*http.Cookie, error)
+	Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error)
 	UserLogin(buf bytes.Buffer) (*http.Cookie, error)
 	GetUserFromCookie(cookieValue string) (string, error)
 	PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error
@@ -37,7 +37,7 @@ func (s *Server) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	cookie, err := s.service.Register(buf)
+	cookie, err := s.service.Register(r.Context(), buf)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		switch {

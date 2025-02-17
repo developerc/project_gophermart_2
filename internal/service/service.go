@@ -18,7 +18,7 @@ import (
 )
 
 type repository interface {
-	Register(buf bytes.Buffer) (*http.Cookie, error)
+	Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error)
 	UserLogin(buf bytes.Buffer) (*http.Cookie, error)
 	GetUserFromCookie(cookieValue string) (string, error)
 	GetServerSettings() *config.ServerSettings
@@ -39,7 +39,7 @@ type LgnPsw struct {
 	Psw string `json:"password"`
 }
 
-func (s *Service) Register(buf bytes.Buffer) (*http.Cookie, error) {
+func (s *Service) Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error) {
 	var err error
 	lgnPsw := LgnPsw{}
 	if err = json.Unmarshal(buf.Bytes(), &lgnPsw); err != nil {
@@ -47,8 +47,8 @@ func (s *Service) Register(buf bytes.Buffer) (*http.Cookie, error) {
 	}
 	log.Println("from Register:", lgnPsw)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()
+	/*ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()*/
 	if err = dbstorage.InsertUser(ctx, s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
 		return nil, err
 	}
