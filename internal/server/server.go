@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"net/http"
 
@@ -17,7 +18,7 @@ type svc interface {
 	Register(buf bytes.Buffer) (*http.Cookie, error)
 	UserLogin(buf bytes.Buffer) (*http.Cookie, error)
 	GetUserFromCookie(cookieValue string) (string, error)
-	PostUserOrders(usr string, buf bytes.Buffer) error
+	PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error
 	GetUserOrders(usr string) ([]byte, error)
 	GetUserBalance(usr string) ([]byte, error)
 	PostBalanceWithdraw(usr string, buf bytes.Buffer) error
@@ -99,7 +100,7 @@ func (s *Server) PostUserOrders(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = s.service.PostUserOrders(usr, buf)
+	err = s.service.PostUserOrders(r.Context(), usr, buf)
 
 	if err != nil {
 		if _, ok := err.(*general.ErrorNumOrder); ok {

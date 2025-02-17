@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"flag"
 	"log"
@@ -83,7 +84,7 @@ func (s *ServerSettings) GetUserFromCookie(cookieValue string) (string, error) {
 	return "", nil
 }
 
-func (s *ServerSettings) PostUserOrders(usr string, buf bytes.Buffer) error {
+func (s *ServerSettings) PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error {
 	return nil
 }
 

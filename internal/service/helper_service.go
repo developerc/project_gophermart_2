@@ -58,14 +58,14 @@ func (s *Service) GetUserFromCookie(cookieValue string) (string, error) {
 	return u.Name, nil
 }
 
-func (s *Service) PostUserOrders(usr string, buf bytes.Buffer) error {
+func (s *Service) PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error {
 	err := checkLuhna(buf.String())
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
+	/*ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()*/
 	if err := dbstorage.UploadOrder(ctx, s.repo.GetServerSettings().DB, usr, buf.String()); err != nil {
 		return err
 	}
