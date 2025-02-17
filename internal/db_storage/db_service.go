@@ -170,7 +170,7 @@ func GetUserOrders(db *sql.DB, usr string) ([]general.UploadedOrder, error) {
 	return arrUploadedOrder, nil
 }
 
-func GetUserBalance2(db *sql.DB, usr string) (general.UserBalance, error) {
+func GetUserBalance(db *sql.DB, usr string) (general.UserBalance, error) {
 	var sumAccrual float64
 	var sumWithdraw float64
 	userBalance := general.UserBalance{}
@@ -221,7 +221,7 @@ func CheckUsrOrderNumb(db *sql.DB, usr string, order string) error {
 	return nil
 }
 
-func BalanceWithdraw2(db *sql.DB, usr string, order string, sum float64) error {
+func BalanceWithdraw(db *sql.DB, usr string, order string, sum float64) error {
 	var sumAccrual float64
 	var sumWithdraw float64
 	var diffSum float64
@@ -261,7 +261,7 @@ func BalanceWithdraw2(db *sql.DB, usr string, order string, sum float64) error {
 	return tx.Commit()
 }
 
-func GetUserWithdrawals2(db *sql.DB, usr string) ([]general.WithdrawOrder, error) {
+func GetUserWithdrawals(db *sql.DB, usr string) ([]general.WithdrawOrder, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
 	defer cancel()
 	rows, err := db.QueryContext(ctx, "SELECT order_numb, withdraw, date_time from orders_table WHERE (usr = $1 AND withdraw > 0) ORDER BY date_time DESC", usr)
