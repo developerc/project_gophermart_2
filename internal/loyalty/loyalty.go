@@ -1,6 +1,7 @@
 package loyalty
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"time"
@@ -14,7 +15,9 @@ func RunLoyalty(db *sql.DB, adresAccrual string) {
 	go func() {
 		for {
 			chanCnt := 5
-			arrOrderNumb, err := dbstorage.GetOrderNumbs(db)
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			//defer cancel()
+			arrOrderNumb, err := dbstorage.GetOrderNumbs(ctx, db)
 			if err != nil {
 				log.Println(err)
 				continue
@@ -22,7 +25,8 @@ func RunLoyalty(db *sql.DB, adresAccrual string) {
 			DoRequests(db, chanCnt, arrOrderNumb, adresAccrual)
 			time.Sleep(time.Duration(retryAfterSec) * time.Second)
 			retryAfterSec = 0
-			time.Sleep(1 * time.Second)
+			cancel()
+			time.Sleep(2 * time.Second)
 		}
 	}()
 }

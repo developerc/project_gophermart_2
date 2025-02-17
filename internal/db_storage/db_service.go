@@ -196,9 +196,8 @@ func GetUserBalance(ctx context.Context, db *sql.DB, usr string) (general.UserBa
 	return userBalance, nil
 }
 
-func CheckUsrOrderNumb(ctx context.Context, db *sql.DB, usr string, order string) error {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
+/*func CheckUsrOrderNumb(ctx context.Context, db *sql.DB, usr string, order string) error {
+
 	rows, err := db.QueryContext(ctx, "SELECT COUNT(*) from orders_table WHERE usr = $1 AND order_numb = $2", usr, order)
 	if err != nil {
 		return err
@@ -219,14 +218,14 @@ func CheckUsrOrderNumb(ctx context.Context, db *sql.DB, usr string, order string
 		return &general.ErrorNumOrder{}
 	}
 	return nil
-}
+}*/
 
-func BalanceWithdraw(db *sql.DB, usr string, order string, sum float64) error {
+func BalanceWithdraw(ctx context.Context, db *sql.DB, usr string, order string, sum float64) error {
 	var sumAccrual float64
 	var sumWithdraw float64
 	var diffSum float64
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -261,9 +260,9 @@ func BalanceWithdraw(db *sql.DB, usr string, order string, sum float64) error {
 	return tx.Commit()
 }
 
-func GetUserWithdrawals(db *sql.DB, usr string) ([]general.WithdrawOrder, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func GetUserWithdrawals(ctx context.Context, db *sql.DB, usr string) ([]general.WithdrawOrder, error) {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT order_numb, withdraw, date_time from orders_table WHERE (usr = $1 AND withdraw > 0) ORDER BY date_time DESC", usr)
 	if err != nil {
 		return nil, err
@@ -291,9 +290,9 @@ func GetUserWithdrawals(db *sql.DB, usr string) ([]general.WithdrawOrder, error)
 	return arrWithdrawOrder, nil
 }
 
-func GetOrderNumbs(db *sql.DB) ([]int, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func GetOrderNumbs(ctx context.Context, db *sql.DB) ([]int, error) {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT order_numb from orders_table WHERE (status = 'NEW' OR status = 'REGISTERED' OR status = 'PROCESSING')")
 	if err != nil {
 		return nil, err
@@ -315,9 +314,9 @@ func GetOrderNumbs(db *sql.DB) ([]int, error) {
 	return arrOrder, nil
 }
 
-func SetStatusAccrual(db *sql.DB, order string, status string, accrual float64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func SetStatusAccrual(ctx context.Context, db *sql.DB, order string, status string, accrual float64) error {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	_, err := db.ExecContext(ctx, "UPDATE orders_table SET status = $1, accrual = $2 WHERE order_numb = $3", status, accrual, order)
 	if err != nil {
 		return err

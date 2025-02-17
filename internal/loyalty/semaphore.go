@@ -1,6 +1,7 @@
 package loyalty
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	dbstorage "github.com/developerc/project_gophermart_2/internal/db_storage"
 	"github.com/developerc/project_gophermart_2/internal/general"
@@ -80,7 +82,9 @@ func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int) error {
 	if err = json.Unmarshal(body, &loyaltyOrder); err != nil {
 		return err
 	}
-	err = dbstorage.SetStatusAccrual(db, loyaltyOrder.Order, loyaltyOrder.Status, loyaltyOrder.Accrual)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	err = dbstorage.SetStatusAccrual(ctx, db, loyaltyOrder.Order, loyaltyOrder.Status, loyaltyOrder.Accrual)
 	if err != nil {
 		log.Println(err)
 		return err
