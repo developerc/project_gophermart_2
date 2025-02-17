@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"time"
 
 	"net/http"
 
@@ -104,7 +103,7 @@ func (s Service) GetUserBalance(ctx context.Context, usr string) ([]byte, error)
 	return jsonBytes, nil
 }
 
-func (s *Service) PostBalanceWithdraw(usr string, buf bytes.Buffer) error {
+func (s *Service) PostBalanceWithdraw(ctx context.Context, usr string, buf bytes.Buffer) error {
 	var err error
 	orderSum := OrderSum{}
 	if err = json.Unmarshal(buf.Bytes(), &orderSum); err != nil {
@@ -114,8 +113,8 @@ func (s *Service) PostBalanceWithdraw(usr string, buf bytes.Buffer) error {
 	if err != nil {
 		return err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()
+	/*ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()*/
 	err = dbstorage.BalanceWithdraw(ctx, s.repo.GetServerSettings().DB, usr, orderSum.Order, orderSum.Sum)
 	if err != nil {
 		return err
@@ -137,9 +136,9 @@ func checkLuhna(order string) error {
 	return nil
 }
 
-func (s *Service) GetUserWithdrawals(usr string) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()
+func (s *Service) GetUserWithdrawals(ctx context.Context, usr string) ([]byte, error) {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()*/
 	arrWithdrawOrder, err := dbstorage.GetUserWithdrawals(ctx, s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err

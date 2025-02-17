@@ -21,8 +21,8 @@ type svc interface {
 	PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error
 	GetUserOrders(ctx context.Context, usr string) ([]byte, error)
 	GetUserBalance(ctx context.Context, usr string) ([]byte, error)
-	PostBalanceWithdraw(usr string, buf bytes.Buffer) error
-	GetUserWithdrawals(usr string) ([]byte, error)
+	PostBalanceWithdraw(ctx context.Context, usr string, buf bytes.Buffer) error
+	GetUserWithdrawals(ctx context.Context, usr string) ([]byte, error)
 }
 
 type Server struct {
@@ -215,7 +215,7 @@ func (s *Server) PostBalanceWithdraw(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = s.service.PostBalanceWithdraw(usr, buf)
+	err = s.service.PostBalanceWithdraw(r.Context(), usr, buf)
 	if err != nil {
 		if _, ok := err.(*general.ErrorLoyaltyPoints); ok {
 			http.Error(w, err.Error(), http.StatusPaymentRequired)
@@ -252,7 +252,7 @@ func (s *Server) GetUserWithdrawals(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	jsonBytes, err := s.service.GetUserWithdrawals(usr)
+	jsonBytes, err := s.service.GetUserWithdrawals(r.Context(), usr)
 	if err != nil {
 		if _, ok := err.(*general.ErrorNoContent); ok {
 			http.Error(w, err.Error(), http.StatusNoContent)

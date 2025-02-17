@@ -25,8 +25,8 @@ type repository interface {
 	PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error
 	GetUserOrders(ctx context.Context, usr string) ([]byte, error)
 	GetUserBalance(ctx context.Context, usr string) ([]byte, error)
-	PostBalanceWithdraw(usr string, buf bytes.Buffer) error
-	GetUserWithdrawals(usr string) ([]byte, error)
+	PostBalanceWithdraw(ctx context.Context, usr string, buf bytes.Buffer) error
+	GetUserWithdrawals(ctx context.Context, usr string) ([]byte, error)
 }
 
 type Service struct {

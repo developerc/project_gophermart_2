@@ -96,10 +96,10 @@ func (s *ServerSettings) GetUserBalance(ctx context.Context, usr string) ([]byte
 	return nil, nil
 }
 
-func (s *ServerSettings) PostBalanceWithdraw(usr string, buf bytes.Buffer) error {
+func (s *ServerSettings) PostBalanceWithdraw(ctx context.Context, usr string, buf bytes.Buffer) error {
 	return nil
 }
 
-func (s *ServerSettings) GetUserWithdrawals(usr string) ([]byte, error) {
+func (s *ServerSettings) GetUserWithdrawals(ctx context.Context, usr string) ([]byte, error) {
 	return nil, nil
 }
