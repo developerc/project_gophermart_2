@@ -2,8 +2,10 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
+	"time"
 
 	//"fmt"
 	"log"
@@ -44,7 +46,10 @@ func (s *Service) Register(buf bytes.Buffer) (*http.Cookie, error) {
 		return nil, err
 	}
 	log.Println("from Register:", lgnPsw)
-	if err = dbstorage.InsertUser(s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	if err = dbstorage.InsertUser(ctx, s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
 		return nil, err
 	}
 	cookie, err := s.SetUserCookie(lgnPsw.Lgn)
@@ -60,7 +65,10 @@ func (s *Service) UserLogin(buf bytes.Buffer) (*http.Cookie, error) {
 	if err = json.Unmarshal(buf.Bytes(), &lgnPsw); err != nil {
 		return nil, err
 	}
-	if err = dbstorage.CheckLgnPsw(s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()
+	if err = dbstorage.CheckLgnPsw(ctx, s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
 		return nil, err
 	}
 	cookie, err := s.SetUserCookie(lgnPsw.Lgn)
@@ -86,7 +94,10 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 
-	if err := dbstorage.CreateTables(serverSettings.DB); err != nil {
+	const duration uint = 20
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(duration)*time.Second)
+	defer cancel()
+	if err := dbstorage.CreateTables(ctx, serverSettings.DB); err != nil {
 		return nil, err
 	}
 	service.InitSecure()

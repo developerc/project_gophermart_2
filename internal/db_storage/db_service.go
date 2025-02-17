@@ -24,10 +24,10 @@ func (e *ErrorLgnPsw) AsLgnPswWrong(err error) bool {
 	return errors.As(err, &e)
 }
 
-func CreateTables(db *sql.DB) error {
-	const duration uint = 20
+func CreateTables(ctx context.Context, db *sql.DB) error {
+	/*const duration uint = 20
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(duration)*time.Second)
-	defer cancel()
+	defer cancel()*/
 	const crusr string = "CREATE TABLE IF NOT EXISTS usr_table( uuid serial primary key, " +
 		"usr TEXT CONSTRAINT must_be_different_usr UNIQUE, psw TEXT)"
 	_, err := db.ExecContext(ctx, crusr)
@@ -51,9 +51,9 @@ func CreateTables(db *sql.DB) error {
 	return nil
 }
 
-func InsertUser(db *sql.DB, usr, psw string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func InsertUser(ctx context.Context, db *sql.DB, usr, psw string) error {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	_, err := db.ExecContext(ctx, "INSERT INTO usr_table (usr, psw) values ($1, crypt($2, gen_salt('md5')))", usr, psw)
 	if err != nil {
 		return err
@@ -61,9 +61,9 @@ func InsertUser(db *sql.DB, usr, psw string) error {
 	return nil
 }
 
-func CheckLgnPsw(db *sql.DB, usr, psw string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func CheckLgnPsw(ctx context.Context, db *sql.DB, usr, psw string) error {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT (psw = crypt($2, psw)) AS password_match FROM usr_table WHERE usr = $1 ", usr, psw)
 	if err != nil {
 		return err
@@ -93,9 +93,9 @@ func CheckLgnPsw(db *sql.DB, usr, psw string) error {
 	return nil
 }
 
-func UploadOrder(db *sql.DB, usr, orderNum string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
+func UploadOrder(ctx context.Context, db *sql.DB, usr, orderNum string) error {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()*/
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -137,9 +137,9 @@ func UploadOrder(db *sql.DB, usr, orderNum string) error {
 	return tx.Commit()
 }
 
-func GetUserOrders(db *sql.DB, usr string) ([]general.UploadedOrder, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func GetUserOrders(ctx context.Context, db *sql.DB, usr string) ([]general.UploadedOrder, error) {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT order_numb, status, accrual, date_time from orders_table WHERE usr = $1 ORDER BY date_time DESC", usr)
 	if err != nil {
 		return nil, err
@@ -170,12 +170,12 @@ func GetUserOrders(db *sql.DB, usr string) ([]general.UploadedOrder, error) {
 	return arrUploadedOrder, nil
 }
 
-func GetUserBalance(db *sql.DB, usr string) (general.UserBalance, error) {
+func GetUserBalance(ctx context.Context, db *sql.DB, usr string) (general.UserBalance, error) {
 	var sumAccrual float64
 	var sumWithdraw float64
 	userBalance := general.UserBalance{}
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT COALESCE(SUM(accrual), 0 ), COALESCE(SUM(withdraw), 0 ) from orders_table WHERE usr = $1 ", usr)
 	if err != nil {
 		return userBalance, err
@@ -196,9 +196,9 @@ func GetUserBalance(db *sql.DB, usr string) (general.UserBalance, error) {
 	return userBalance, nil
 }
 
-func CheckUsrOrderNumb(db *sql.DB, usr string, order string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
+func CheckUsrOrderNumb(ctx context.Context, db *sql.DB, usr string, order string) error {
+	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT COUNT(*) from orders_table WHERE usr = $1 AND order_numb = $2", usr, order)
 	if err != nil {
 		return err

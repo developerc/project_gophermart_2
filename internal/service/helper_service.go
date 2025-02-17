@@ -2,7 +2,9 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"time"
 
 	"net/http"
 
@@ -62,14 +64,18 @@ func (s *Service) PostUserOrders(usr string, buf bytes.Buffer) error {
 		return err
 	}
 
-	if err := dbstorage.UploadOrder(s.repo.GetServerSettings().DB, usr, buf.String()); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := dbstorage.UploadOrder(ctx, s.repo.GetServerSettings().DB, usr, buf.String()); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (s *Service) GetUserOrders(usr string) ([]byte, error) {
-	arrUploadedOrder, err := dbstorage.GetUserOrders(s.repo.GetServerSettings().DB, usr)
+	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()
+	arrUploadedOrder, err := dbstorage.GetUserOrders(ctx, s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +91,9 @@ func (s *Service) GetUserOrders(usr string) ([]byte, error) {
 }
 
 func (s Service) GetUserBalance(usr string) ([]byte, error) {
-	userBalance, err := dbstorage.GetUserBalance(s.repo.GetServerSettings().DB, usr)
+	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()
+	userBalance, err := dbstorage.GetUserBalance(ctx, s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
 	}
