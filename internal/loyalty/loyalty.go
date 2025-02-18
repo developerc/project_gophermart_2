@@ -35,7 +35,7 @@ func RunLoyalty2(chSignal general.ChSignal, db *sql.DB, adresAccrual string) {
 		for {
 			chanCnt := 5
 			//ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-			select {
+			/*select {
 			case <-chSignal.ChStart:
 				//fmt.Println("received POST /api/user/orders")
 				arrOrderNumb, err := dbstorage.GetOrderNumbs(db)
@@ -44,8 +44,15 @@ func RunLoyalty2(chSignal general.ChSignal, db *sql.DB, adresAccrual string) {
 					continue
 				}
 				DoRequests(db, chanCnt, arrOrderNumb, adresAccrual)
-			}
+			}*/
 			//cancel()
+			<-chSignal.ChStart
+			arrOrderNumb, err := dbstorage.GetOrderNumbs(db)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			DoRequests(db, chanCnt, arrOrderNumb, adresAccrual)
 		}
 	}()
 }
