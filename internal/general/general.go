@@ -93,3 +93,7 @@ type LoyaltyOrder struct {
 	Status  string  `json:"status"`
 	Accrual float64 `json:"accrual,omitempty"`
 }
+
+type ChSignal struct {
+	ChStart chan struct{}
+}

@@ -13,6 +13,8 @@ import (
 
 	"github.com/developerc/project_gophermart_2/internal/config"
 	dbstorage "github.com/developerc/project_gophermart_2/internal/db_storage"
+	"github.com/developerc/project_gophermart_2/internal/general"
+
 	"github.com/developerc/project_gophermart_2/internal/loyalty"
 	"github.com/gorilla/securecookie"
 )
@@ -30,8 +32,9 @@ type repository interface {
 }
 
 type Service struct {
-	repo   repository
-	secure *securecookie.SecureCookie
+	repo     repository
+	secure   *securecookie.SecureCookie
+	chSignal general.ChSignal
 }
 
 type LgnPsw struct {
@@ -101,8 +104,16 @@ func NewService() (*Service, error) {
 		return nil, err
 	}
 	service.InitSecure()
-	loyalty.RunLoyalty(serverSettings.DB, serverSettings.AdresAccrual)
+	service.InitChSignal()
+	//loyalty.RunLoyalty(serverSettings.DB, serverSettings.AdresAccrual)
+	loyalty.RunLoyalty2(service.chSignal, serverSettings.DB, serverSettings.AdresAccrual)
 	return &service, nil
+}
+
+func (s *Service) InitChSignal() {
+	var chSignal general.ChSignal = general.ChSignal{}
+	chSignal.ChStart = make(chan struct{})
+	s.chSignal = chSignal
 }
 
 func (s *Service) InitSecure() {

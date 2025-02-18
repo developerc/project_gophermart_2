@@ -290,9 +290,9 @@ func GetUserWithdrawals(ctx context.Context, db *sql.DB, usr string) ([]general.
 	return arrWithdrawOrder, nil
 }
 
-func GetOrderNumbs(ctx context.Context, db *sql.DB) ([]int, error) {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
+func GetOrderNumbs( /*ctx context.Context,*/ db *sql.DB) ([]int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+	defer cancel()
 	rows, err := db.QueryContext(ctx, "SELECT order_numb from orders_table WHERE (status = 'NEW' OR status = 'REGISTERED' OR status = 'PROCESSING')")
 	if err != nil {
 		return nil, err
@@ -311,6 +311,7 @@ func GetOrderNumbs(ctx context.Context, db *sql.DB) ([]int, error) {
 	if err != nil {
 		return nil, err
 	}
+	//fmt.Println(arrOrder)
 	return arrOrder, nil
 }
 

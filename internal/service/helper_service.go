@@ -68,6 +68,7 @@ func (s *Service) PostUserOrders(ctx context.Context, usr string, buf bytes.Buff
 	if err := dbstorage.UploadOrder(ctx, s.repo.GetServerSettings().DB, usr, buf.String()); err != nil {
 		return err
 	}
+	s.chSignal.ChStart <- struct{}{}
 	return nil
 }
 
