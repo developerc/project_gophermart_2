@@ -96,4 +96,5 @@ type LoyaltyOrder struct {
 
 type ChSignal struct {
 	ChStart chan struct{}
+	ChPause chan int
 }

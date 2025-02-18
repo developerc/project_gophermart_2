@@ -34,24 +34,30 @@ func (s *Semaphore) Release() {
 	<-s.semaCh
 }
 
-func DoRequests(db *sql.DB, chanCnt int, arrOrderNumb []int, adresAccrual string) {
+func DoRequests(db *sql.DB, chanCnt int, arrOrderNumb []int, adresAccrual string, chSignal general.ChSignal) {
 	var wg sync.WaitGroup
 	semaphore := NewSemaphore(chanCnt)
 	for idx := 0; idx < len(arrOrderNumb); idx++ {
-		wg.Add(1)
-		go func(orderNumb int) {
-			semaphore.Acquire()
-			defer wg.Done()
-			defer semaphore.Release()
-			if err := ReqLoyalty(db, adresAccrual, orderNumb); err != nil {
-				log.Println(err)
-			}
-		}(arrOrderNumb[idx])
+		select {
+		case pause := <-chSignal.ChPause:
+			time.Sleep(time.Duration(pause) * time.Second)
+		default:
+			wg.Add(1)
+			go func(orderNumb int) {
+				semaphore.Acquire()
+				defer wg.Done()
+				defer semaphore.Release()
+				if err := ReqLoyalty(db, adresAccrual, orderNumb, chSignal); err != nil {
+					log.Println(err)
+				}
+			}(arrOrderNumb[idx])
+		}
+		wg.Wait()
+
 	}
-	wg.Wait()
 }
 
-func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int) error {
+func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int, chSignal general.ChSignal) error {
 	response, err := http.Get(adresAccrual + "/api/orders/" + strconv.FormatInt(int64(orderNumb), 10))
 	if err != nil {
 		log.Println(err)
@@ -70,6 +76,7 @@ func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int) error {
 		if err != nil {
 			retryAfterSec = 0
 		}
+		chSignal.ChPause <- retryAfterSec
 		return errors.New("response Status code: 429")
 	}
 	body, err := io.ReadAll(response.Body)

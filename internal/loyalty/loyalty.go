@@ -52,7 +52,7 @@ func RunLoyalty2(chSignal general.ChSignal, db *sql.DB, adresAccrual string) {
 				log.Println(err)
 				continue
 			}
-			DoRequests(db, chanCnt, arrOrderNumb, adresAccrual)
+			DoRequests(db, chanCnt, arrOrderNumb, adresAccrual, chSignal)
 		}
 	}()
 }

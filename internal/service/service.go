@@ -113,6 +113,7 @@ func NewService() (*Service, error) {
 func (s *Service) InitChSignal() {
 	chSignal := general.ChSignal{}
 	chSignal.ChStart = make(chan struct{})
+	chSignal.ChPause = make(chan int)
 	s.chSignal = chSignal
 }
 
