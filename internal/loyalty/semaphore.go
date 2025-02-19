@@ -72,7 +72,7 @@ func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int, chSignal general
 	}
 	if stCode == 429 {
 		retryAfter := response.Header.Get("Retry-After")
-		retryAfterSec, err = strconv.Atoi(retryAfter)
+		retryAfterSec, err := strconv.Atoi(retryAfter)
 		if err != nil {
 			retryAfterSec = 0
 		}

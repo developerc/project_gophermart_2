@@ -22,14 +22,11 @@ type OrderSum struct {
 }
 
 func (s *Service) SetUserCookie(usr string) (*http.Cookie, error) {
-	//var usr string
 	var cookie *http.Cookie
-	//var err error
 	u := &User{
 		Name: usr,
 	}
 
-	//if len(cookieValue) == 0 {
 	u.Name = usr
 	if encoded, err := s.secure.Encode("user", u); err == nil {
 		cookie = &http.Cookie{
@@ -40,8 +37,6 @@ func (s *Service) SetUserCookie(usr string) (*http.Cookie, error) {
 	} else {
 		return nil, err
 	}
-	//}
-	//return nil,  nil
 }
 
 func (s *Service) GetUserFromCookie(cookieValue string) (string, error) {
@@ -52,7 +47,6 @@ func (s *Service) GetUserFromCookie(cookieValue string) (string, error) {
 	if err := s.secure.Decode("user", cookieValue, u); err != nil {
 		return "", err
 	}
-	//fmt.Println("u: ", u)
 
 	return u.Name, nil
 }
@@ -63,8 +57,6 @@ func (s *Service) PostUserOrders(ctx context.Context, usr string, buf bytes.Buff
 		return err
 	}
 
-	/*ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()*/
 	if err := dbstorage.UploadOrder(ctx, s.repo.GetServerSettings().DB, usr, buf.String()); err != nil {
 		return err
 	}
@@ -73,8 +65,6 @@ func (s *Service) PostUserOrders(ctx context.Context, usr string, buf bytes.Buff
 }
 
 func (s *Service) GetUserOrders(ctx context.Context, usr string) ([]byte, error) {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	arrUploadedOrder, err := dbstorage.GetUserOrders(ctx, s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
@@ -91,8 +81,6 @@ func (s *Service) GetUserOrders(ctx context.Context, usr string) ([]byte, error)
 }
 
 func (s Service) GetUserBalance(ctx context.Context, usr string) ([]byte, error) {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	userBalance, err := dbstorage.GetUserBalance(ctx, s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
@@ -114,8 +102,6 @@ func (s *Service) PostBalanceWithdraw(ctx context.Context, usr string, buf bytes
 	if err != nil {
 		return err
 	}
-	/*ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()*/
 	err = dbstorage.BalanceWithdraw(ctx, s.repo.GetServerSettings().DB, usr, orderSum.Order, orderSum.Sum)
 	if err != nil {
 		return err
@@ -138,8 +124,6 @@ func checkLuhna(order string) error {
 }
 
 func (s *Service) GetUserWithdrawals(ctx context.Context, usr string) ([]byte, error) {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()*/
 	arrWithdrawOrder, err := dbstorage.GetUserWithdrawals(ctx, s.repo.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err

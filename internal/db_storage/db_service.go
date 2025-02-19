@@ -25,9 +25,6 @@ func (e *ErrorLgnPsw) AsLgnPswWrong(err error) bool {
 }
 
 func CreateTables(ctx context.Context, db *sql.DB) error {
-	/*const duration uint = 20
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(duration)*time.Second)
-	defer cancel()*/
 	const crusr string = "CREATE TABLE IF NOT EXISTS usr_table( uuid serial primary key, " +
 		"usr TEXT CONSTRAINT must_be_different_usr UNIQUE, psw TEXT)"
 	_, err := db.ExecContext(ctx, crusr)
@@ -52,8 +49,6 @@ func CreateTables(ctx context.Context, db *sql.DB) error {
 }
 
 func InsertUser(ctx context.Context, db *sql.DB, usr, psw string) error {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	_, err := db.ExecContext(ctx, "INSERT INTO usr_table (usr, psw) values ($1, crypt($2, gen_salt('md5')))", usr, psw)
 	if err != nil {
 		return err
@@ -62,8 +57,6 @@ func InsertUser(ctx context.Context, db *sql.DB, usr, psw string) error {
 }
 
 func CheckLgnPsw(ctx context.Context, db *sql.DB, usr, psw string) error {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT (psw = crypt($2, psw)) AS password_match FROM usr_table WHERE usr = $1 ", usr, psw)
 	if err != nil {
 		return err
@@ -94,8 +87,6 @@ func CheckLgnPsw(ctx context.Context, db *sql.DB, usr, psw string) error {
 }
 
 func UploadOrder(ctx context.Context, db *sql.DB, usr, orderNum string) error {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()*/
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -138,8 +129,6 @@ func UploadOrder(ctx context.Context, db *sql.DB, usr, orderNum string) error {
 }
 
 func GetUserOrders(ctx context.Context, db *sql.DB, usr string) ([]general.UploadedOrder, error) {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT order_numb, status, accrual, date_time from orders_table WHERE usr = $1 ORDER BY date_time DESC", usr)
 	if err != nil {
 		return nil, err
@@ -174,8 +163,6 @@ func GetUserBalance(ctx context.Context, db *sql.DB, usr string) (general.UserBa
 	var sumAccrual float64
 	var sumWithdraw float64
 	userBalance := general.UserBalance{}
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT COALESCE(SUM(accrual), 0 ), COALESCE(SUM(withdraw), 0 ) from orders_table WHERE usr = $1 ", usr)
 	if err != nil {
 		return userBalance, err
@@ -196,36 +183,10 @@ func GetUserBalance(ctx context.Context, db *sql.DB, usr string) (general.UserBa
 	return userBalance, nil
 }
 
-/*func CheckUsrOrderNumb(ctx context.Context, db *sql.DB, usr string, order string) error {
-
-	rows, err := db.QueryContext(ctx, "SELECT COUNT(*) from orders_table WHERE usr = $1 AND order_numb = $2", usr, order)
-	if err != nil {
-		return err
-	}
-	var cnt int
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(&cnt)
-		if err != nil {
-			return err
-		}
-	}
-	err = rows.Err()
-	if err != nil {
-		return err
-	}
-	if cnt != 1 {
-		return &general.ErrorNumOrder{}
-	}
-	return nil
-}*/
-
 func BalanceWithdraw(ctx context.Context, db *sql.DB, usr string, order string, sum float64) error {
 	var sumAccrual float64
 	var sumWithdraw float64
 	var diffSum float64
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -261,8 +222,6 @@ func BalanceWithdraw(ctx context.Context, db *sql.DB, usr string, order string, 
 }
 
 func GetUserWithdrawals(ctx context.Context, db *sql.DB, usr string) ([]general.WithdrawOrder, error) {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	rows, err := db.QueryContext(ctx, "SELECT order_numb, withdraw, date_time from orders_table WHERE (usr = $1 AND withdraw > 0) ORDER BY date_time DESC", usr)
 	if err != nil {
 		return nil, err
@@ -290,7 +249,7 @@ func GetUserWithdrawals(ctx context.Context, db *sql.DB, usr string) ([]general.
 	return arrWithdrawOrder, nil
 }
 
-func GetOrderNumbs( /*ctx context.Context,*/ db *sql.DB) ([]int, error) {
+func GetOrderNumbs(db *sql.DB) ([]int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
 	defer cancel()
 	rows, err := db.QueryContext(ctx, "SELECT order_numb from orders_table WHERE (status = 'NEW' OR status = 'REGISTERED' OR status = 'PROCESSING')")
@@ -311,13 +270,10 @@ func GetOrderNumbs( /*ctx context.Context,*/ db *sql.DB) ([]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Println(arrOrder)
 	return arrOrder, nil
 }
 
 func SetStatusAccrual(ctx context.Context, db *sql.DB, order string, status string, accrual float64) error {
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	_, err := db.ExecContext(ctx, "UPDATE orders_table SET status = $1, accrual = $2 WHERE order_numb = $3", status, accrual, order)
 	if err != nil {
 		return err

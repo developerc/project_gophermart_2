@@ -2,7 +2,6 @@ package general
 
 import (
 	"errors"
-	//"time"
 )
 
 type ErrorNumOrder struct {

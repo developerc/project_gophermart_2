@@ -5,11 +5,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"time"
-
-	//"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/developerc/project_gophermart_2/internal/config"
 	dbstorage "github.com/developerc/project_gophermart_2/internal/db_storage"
@@ -50,8 +48,6 @@ func (s *Service) Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie,
 	}
 	log.Println("from Register:", lgnPsw)
 
-	/*ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()*/
 	if err = dbstorage.InsertUser(ctx, s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
 		return nil, err
 	}
@@ -69,8 +65,6 @@ func (s *Service) UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie
 		return nil, err
 	}
 
-	/*ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()*/
 	if err = dbstorage.CheckLgnPsw(ctx, s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
 		return nil, err
 	}
@@ -105,8 +99,7 @@ func NewService() (*Service, error) {
 	}
 	service.InitSecure()
 	service.InitChSignal()
-	//loyalty.RunLoyalty(serverSettings.DB, serverSettings.AdresAccrual)
-	loyalty.RunLoyalty2(service.chSignal, serverSettings.DB, serverSettings.AdresAccrual)
+	loyalty.RunLoyalty(service.chSignal, serverSettings.DB, serverSettings.AdresAccrual)
 	return &service, nil
 }
 
