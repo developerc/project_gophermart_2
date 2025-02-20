@@ -61,42 +61,6 @@ func InitServerSettings() (*ServerSettings, error) {
 	return serverSettings, nil
 }
 
-/*func (s *ServerSettings) GetAdresRun() string {
-	return s.AdresRun
-}*/
-
 func (s *ServerSettings) GetServerSettings() *ServerSettings {
 	return s
 }
-
-/*func (s *ServerSettings) Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error) {
-	return nil, nil
-}
-
-func (s *ServerSettings) UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie, error) {
-	return nil, nil
-}
-
-func (s *ServerSettings) GetUserFromCookie(cookieValue string) (string, error) {
-	return "", nil
-}
-
-func (s *ServerSettings) PostUserOrders(ctx context.Context, usr string, buf bytes.Buffer) error {
-	return nil
-}
-
-func (s *ServerSettings) GetUserOrders(ctx context.Context, usr string) ([]byte, error) {
-	return nil, nil
-}
-
-func (s *ServerSettings) GetUserBalance(ctx context.Context, usr string) ([]byte, error) {
-	return nil, nil
-}
-
-func (s *ServerSettings) PostBalanceWithdraw(ctx context.Context, usr string, buf bytes.Buffer) error {
-	return nil
-}
-
-func (s *ServerSettings) GetUserWithdrawals(ctx context.Context, usr string) ([]byte, error) {
-	return nil, nil
-}*/
