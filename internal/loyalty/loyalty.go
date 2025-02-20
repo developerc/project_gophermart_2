@@ -27,3 +27,31 @@ func RunLoyalty(chSignal general.ChSignal, db *sql.DB, adresAccrual string) {
 		}
 	}()
 }
+
+func RunLoyalty2(chSignal general.ChSignal, db *sql.DB, adresAccrual string) {
+	jobs := make(chan int)
+	for i := 0; i < 5; i++ {
+		go worker(db, adresAccrual, chSignal, jobs)
+	}
+	go func() {
+		for {
+			select {
+			case <-chSignal.ChStart:
+				arrOrderNumb, err := dbstorage.GetOrderNumbs(db)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				//DoRequests(db, chanCnt, arrOrderNumb, adresAccrual, chSignal)
+				for _, orderNumb := range arrOrderNumb {
+					jobs <- orderNumb
+				}
+			case pause := <-chSignal.ChPause:
+				//устанавливаем атомик
+				time.Sleep(time.Duration(pause) * time.Second)
+				//сбрасываем атомик
+			}
+		}
+	}()
+
+}

@@ -99,7 +99,7 @@ func NewService() (*Service, error) {
 	}
 	service.InitSecure()
 	service.InitChSignal()
-	loyalty.RunLoyalty(service.chSignal, serverSettings.DB, serverSettings.AdresAccrual)
+	loyalty.RunLoyalty2(service.chSignal, serverSettings.DB, serverSettings.AdresAccrual)
 	return &service, nil
 }
 

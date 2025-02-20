@@ -64,6 +64,7 @@ func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int, chSignal general
 		return err
 	}
 	stCode := response.StatusCode
+	//fmt.Println("ReqLoyalty stCode: ", stCode)
 	if stCode == 204 {
 		return errors.New("response Status code: 204")
 	}
@@ -97,4 +98,15 @@ func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int, chSignal general
 		return err
 	}
 	return nil
+}
+
+// --
+func worker(db *sql.DB, adresAccrual string, chSignal general.ChSignal, jobs <-chan int) {
+	for orderNumb := range jobs {
+		//fmt.Println("worker: ", orderNumb)
+		//проверяем атомик с временем задержки
+		if err := ReqLoyalty(db, adresAccrual, orderNumb, chSignal); err != nil {
+			log.Println(err)
+		}
+	}
 }
