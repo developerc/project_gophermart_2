@@ -9,14 +9,14 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"sync"
+	"sync/atomic"
 	"time"
 
 	dbstorage "github.com/developerc/project_gophermart_2/internal/db_storage"
 	"github.com/developerc/project_gophermart_2/internal/general"
 )
 
-type Semaphore struct {
+/*type Semaphore struct {
 	semaCh chan struct{}
 }
 
@@ -55,7 +55,7 @@ func DoRequests(db *sql.DB, chanCnt int, arrOrderNumb []int, adresAccrual string
 		wg.Wait()
 
 	}
-}
+}*/
 
 func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int, chSignal general.ChSignal) error {
 	response, err := http.Get(adresAccrual + "/api/orders/" + strconv.FormatInt(int64(orderNumb), 10))
@@ -105,6 +105,9 @@ func worker(db *sql.DB, adresAccrual string, chSignal general.ChSignal, jobs <-c
 	for orderNumb := range jobs {
 		//fmt.Println("worker: ", orderNumb)
 		//проверяем атомик с временем задержки
+		if atomic.LoadInt32(&sleepSec) > 0 {
+			time.Sleep(time.Duration(atomic.LoadInt32(&sleepSec)) * time.Second)
+		}
 		if err := ReqLoyalty(db, adresAccrual, orderNumb, chSignal); err != nil {
 			log.Println(err)
 		}
