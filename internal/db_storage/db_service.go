@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"log"
 	"time"
@@ -193,7 +194,7 @@ func BalanceWithdraw(ctx context.Context, db *sql.DB, usr string, order string, 
 	}
 	defer tx.Rollback()
 
-	rows, err := db.QueryContext(ctx, "SELECT COALESCE(SUM(accrual), 0 ), COALESCE(SUM(withdraw), 0 ) from orders_table WHERE usr = $1 ", usr)
+	rows, err := db.QueryContext(ctx, "SELECT COALESCE(SUM(accrual), 0 ), COALESCE(SUM(withdraw), 0 ) from orders_table WHERE usr = $1 FOR UPDATE", usr)
 	if err != nil {
 		return err
 	}
@@ -201,6 +202,7 @@ func BalanceWithdraw(ctx context.Context, db *sql.DB, usr string, order string, 
 	for rows.Next() {
 		err = rows.Scan(&sumAccrual, &sumWithdraw)
 		if err != nil {
+			fmt.Println("BalanceWithdraw err: ", err)
 			return err
 		}
 	}
@@ -210,11 +212,13 @@ func BalanceWithdraw(ctx context.Context, db *sql.DB, usr string, order string, 
 	}
 	diffSum = sumAccrual - sumWithdraw
 	if diffSum < sum {
+		fmt.Println("BalanceWithdraw err: ", err)
 		return &general.ErrorLoyaltyPoints{}
 	}
 
 	_, err = db.ExecContext(ctx, "INSERT INTO orders_table (usr, order_numb, withdraw) values ($1, $2, $3)", usr, order, sum)
 	if err != nil {
+		fmt.Println("BalanceWithdraw err: ", err)
 		return err
 	}
 
