@@ -30,9 +30,10 @@ type repository interface {
 }
 
 type Service struct {
-	repo     repository
-	secure   *securecookie.SecureCookie
-	chSignal general.ChSignal
+	repo           repository
+	secure         *securecookie.SecureCookie
+	chSignal       general.ChSignal
+	serverSettings config.ServerSettings
 }
 
 type LgnPsw struct {
@@ -48,7 +49,7 @@ func (s *Service) Register(ctx context.Context, buf bytes.Buffer) (*http.Cookie,
 	}
 	log.Println("from Register:", lgnPsw)
 
-	if err = dbstorage.InsertUser(ctx, s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
+	if err = dbstorage.InsertUser(ctx, s.serverSettings.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
 		return nil, err
 	}
 	cookie, err := s.SetUserCookie(lgnPsw.Lgn)
@@ -65,7 +66,7 @@ func (s *Service) UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie
 		return nil, err
 	}
 
-	if err = dbstorage.CheckLgnPsw(ctx, s.repo.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
+	if err = dbstorage.CheckLgnPsw(ctx, s.serverSettings.GetServerSettings().DB, lgnPsw.Lgn, lgnPsw.Psw); err != nil {
 		return nil, err
 	}
 	cookie, err := s.SetUserCookie(lgnPsw.Lgn)
@@ -76,7 +77,8 @@ func (s *Service) UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie
 }
 
 func (s *Service) GetAdresRun() string {
-	return s.repo.GetServerSettings().AdresRun
+	//return s.repo.GetServerSettings().AdresRun
+	return s.serverSettings.GetServerSettings().AdresRun
 }
 
 func NewService() (*Service, error) {
@@ -85,12 +87,14 @@ func NewService() (*Service, error) {
 	if err != nil {
 		log.Println(err)
 	}
-	service := Service{repo: serverSettings}
+
+	//service := Service{repo: serverSettings}
 	serverSettings.DB, err = sql.Open("pgx", serverSettings.AdresBase)
 	if err != nil {
 		return nil, err
 	}
-
+	service := Service{}
+	service.serverSettings = *serverSettings
 	const duration uint = 20
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(duration)*time.Second)
 	defer cancel()
@@ -99,7 +103,7 @@ func NewService() (*Service, error) {
 	}
 	service.InitSecure()
 	service.InitChSignal()
-	loyalty.RunLoyalty2(service.chSignal, serverSettings.DB, serverSettings.AdresAccrual)
+	loyalty.RunLoyalty(service.chSignal, serverSettings.DB, serverSettings.AdresAccrual)
 	return &service, nil
 }
 
@@ -111,7 +115,8 @@ func (s *Service) InitChSignal() {
 }
 
 func (s *Service) InitSecure() {
-	var hashKey = []byte(s.repo.GetServerSettings().SecretCookies)
+	//var hashKey = []byte(s.repo.GetServerSettings().SecretCookies)
+	var hashKey = []byte(s.serverSettings.GetServerSettings().SecretCookies)
 	var blockKey = []byte("a-lot-secret-qwe")
 	s.secure = securecookie.New(hashKey, blockKey)
 }

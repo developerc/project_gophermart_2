@@ -31,7 +31,7 @@ import (
 
 var sleepSec int32
 
-func RunLoyalty2(chSignal general.ChSignal, db *sql.DB, adresAccrual string) {
+func RunLoyalty(chSignal general.ChSignal, db *sql.DB, adresAccrual string) {
 	atomic.StoreInt32(&sleepSec, 0)
 	jobs := make(chan int)
 	for i := 0; i < 5; i++ {

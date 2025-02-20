@@ -57,7 +57,7 @@ func (s *Service) PostUserOrders(ctx context.Context, usr string, buf bytes.Buff
 		return err
 	}
 
-	if err := dbstorage.UploadOrder(ctx, s.repo.GetServerSettings().DB, usr, buf.String()); err != nil {
+	if err := dbstorage.UploadOrder(ctx, s.serverSettings.GetServerSettings().DB, usr, buf.String()); err != nil {
 		return err
 	}
 	s.chSignal.ChStart <- struct{}{}
@@ -65,7 +65,7 @@ func (s *Service) PostUserOrders(ctx context.Context, usr string, buf bytes.Buff
 }
 
 func (s *Service) GetUserOrders(ctx context.Context, usr string) ([]byte, error) {
-	arrUploadedOrder, err := dbstorage.GetUserOrders(ctx, s.repo.GetServerSettings().DB, usr)
+	arrUploadedOrder, err := dbstorage.GetUserOrders(ctx, s.serverSettings.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (s *Service) GetUserOrders(ctx context.Context, usr string) ([]byte, error)
 }
 
 func (s Service) GetUserBalance(ctx context.Context, usr string) ([]byte, error) {
-	userBalance, err := dbstorage.GetUserBalance(ctx, s.repo.GetServerSettings().DB, usr)
+	userBalance, err := dbstorage.GetUserBalance(ctx, s.serverSettings.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (s *Service) PostBalanceWithdraw(ctx context.Context, usr string, buf bytes
 	if err != nil {
 		return err
 	}
-	err = dbstorage.BalanceWithdraw(ctx, s.repo.GetServerSettings().DB, usr, orderSum.Order, orderSum.Sum)
+	err = dbstorage.BalanceWithdraw(ctx, s.serverSettings.GetServerSettings().DB, usr, orderSum.Order, orderSum.Sum)
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func checkLuhna(order string) error {
 }
 
 func (s *Service) GetUserWithdrawals(ctx context.Context, usr string) ([]byte, error) {
-	arrWithdrawOrder, err := dbstorage.GetUserWithdrawals(ctx, s.repo.GetServerSettings().DB, usr)
+	arrWithdrawOrder, err := dbstorage.GetUserWithdrawals(ctx, s.serverSettings.GetServerSettings().DB, usr)
 	if err != nil {
 		return nil, err
 	}
