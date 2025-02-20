@@ -77,7 +77,6 @@ func (s *Service) UserLogin(ctx context.Context, buf bytes.Buffer) (*http.Cookie
 }
 
 func (s *Service) GetAdresRun() string {
-	//return s.repo.GetServerSettings().AdresRun
 	return s.serverSettings.GetServerSettings().AdresRun
 }
 
@@ -88,7 +87,6 @@ func NewService() (*Service, error) {
 		log.Println(err)
 	}
 
-	//service := Service{repo: serverSettings}
 	serverSettings.DB, err = sql.Open("pgx", serverSettings.AdresBase)
 	if err != nil {
 		return nil, err
@@ -115,7 +113,6 @@ func (s *Service) InitChSignal() {
 }
 
 func (s *Service) InitSecure() {
-	//var hashKey = []byte(s.repo.GetServerSettings().SecretCookies)
 	var hashKey = []byte(s.serverSettings.GetServerSettings().SecretCookies)
 	var blockKey = []byte("a-lot-secret-qwe")
 	s.secure = securecookie.New(hashKey, blockKey)

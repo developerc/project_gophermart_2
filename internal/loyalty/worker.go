@@ -16,47 +16,6 @@ import (
 	"github.com/developerc/project_gophermart_2/internal/general"
 )
 
-/*type Semaphore struct {
-	semaCh chan struct{}
-}
-
-func NewSemaphore(maxReq int) *Semaphore {
-	return &Semaphore{
-		semaCh: make(chan struct{}, maxReq),
-	}
-}
-
-func (s *Semaphore) Acquire() {
-	s.semaCh <- struct{}{}
-}
-
-func (s *Semaphore) Release() {
-	<-s.semaCh
-}
-
-func DoRequests(db *sql.DB, chanCnt int, arrOrderNumb []int, adresAccrual string, chSignal general.ChSignal) {
-	var wg sync.WaitGroup
-	semaphore := NewSemaphore(chanCnt)
-	for idx := 0; idx < len(arrOrderNumb); idx++ {
-		select {
-		case pause := <-chSignal.ChPause:
-			time.Sleep(time.Duration(pause) * time.Second)
-		default:
-			wg.Add(1)
-			go func(orderNumb int) {
-				semaphore.Acquire()
-				defer wg.Done()
-				defer semaphore.Release()
-				if err := ReqLoyalty(db, adresAccrual, orderNumb, chSignal); err != nil {
-					log.Println(err)
-				}
-			}(arrOrderNumb[idx])
-		}
-		wg.Wait()
-
-	}
-}*/
-
 func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int, chSignal general.ChSignal) error {
 	response, err := http.Get(adresAccrual + "/api/orders/" + strconv.FormatInt(int64(orderNumb), 10))
 	if err != nil {
@@ -64,7 +23,6 @@ func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int, chSignal general
 		return err
 	}
 	stCode := response.StatusCode
-	//fmt.Println("ReqLoyalty stCode: ", stCode)
 	if stCode == 204 {
 		return errors.New("response Status code: 204")
 	}
@@ -100,11 +58,8 @@ func ReqLoyalty(db *sql.DB, adresAccrual string, orderNumb int, chSignal general
 	return nil
 }
 
-// --
 func worker(db *sql.DB, adresAccrual string, chSignal general.ChSignal, jobs <-chan int) {
 	for orderNumb := range jobs {
-		//fmt.Println("worker: ", orderNumb)
-		//проверяем атомик с временем задержки
 		if atomic.LoadInt32(&sleepSec) > 0 {
 			time.Sleep(time.Duration(atomic.LoadInt32(&sleepSec)) * time.Second)
 		}
