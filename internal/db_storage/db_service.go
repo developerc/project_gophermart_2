@@ -194,7 +194,7 @@ func BalanceWithdraw(ctx context.Context, db *sql.DB, usr string, order string, 
 	}
 	defer tx.Rollback()
 
-	rows, err := db.QueryContext(ctx, "SELECT COALESCE(SUM(accrual), 0 ), COALESCE(SUM(withdraw), 0 ) from orders_table WHERE usr = $1 FOR UPDATE", usr)
+	rows, err := db.QueryContext(ctx, "SELECT COALESCE(SUM(accrual), 0 ), COALESCE(SUM(withdraw), 0 ) from orders_table WHERE usr = $1 ", usr)
 	if err != nil {
 		return err
 	}
